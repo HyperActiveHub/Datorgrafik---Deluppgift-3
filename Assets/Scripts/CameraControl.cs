@@ -87,8 +87,8 @@ public class CameraControl : MonoBehaviour
                 Quaternion target = myCamera.transform.rotation;
                 target.z = 0;
                 //target = myCamera.transform.localToWorldMatrix
-                Matrix4x4 rotMatrix = Matrix4x4.Rotate(target);
-                target = rotMatrix.rotation;
+                //Matrix4x4 rotMatrix = Matrix4x4.Rotate(target);
+                //target = rotMatrix.rotation;
                 myCamera.transform.rotation = Quaternion.RotateTowards(myCamera.transform.rotation, target, rotationSpeed * Time.deltaTime);
             }
             else
