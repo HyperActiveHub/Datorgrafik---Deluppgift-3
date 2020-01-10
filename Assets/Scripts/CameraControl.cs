@@ -47,29 +47,26 @@ public class CameraControl : MonoBehaviour
 
     void Movement()
     {
-        float inputSide = Input.GetAxis("Horizontal") * moveSpeed;
-        float inputDir = Input.GetAxis("Vertical") * moveSpeed;
+        float inputSide = Input.GetAxisRaw("Horizontal");
+        float inputDir = Input.GetAxisRaw("Vertical");
         Vector3 worldMove = new Vector3(inputSide, 0.0f, inputDir);
 
         if (!Input.GetKey(KeyCode.LeftShift))
         {
             Vector3 localMove = myCamera.transform.localToWorldMatrix.MultiplyVector(worldMove);
             localMove.y = 0;
-            Move(localMove);
+            Move(localMove.normalized * moveSpeed);
         }
         else
         {
-            Move(worldMove);
+            Move(worldMove.normalized * moveSpeed);
         }
     }
 
     void Rotation()
     {
         float inputX = Input.GetAxis("Mouse X");
-        Rotate(Vector3.up, inputX * rotationSpeed, Space.World);
-
         float inputY = Input.GetAxis("Mouse Y");
-        Rotate(Vector3.right, -inputY * rotationSpeed, Space.Self);
 
         if (Input.GetMouseButtonDown(1))
         {
@@ -82,18 +79,20 @@ public class CameraControl : MonoBehaviour
         }
         else if (roll)
         {
-            if (Mathf.Abs(myCamera.transform.eulerAngles.z) > 0.001f)
+            Quaternion target = myCamera.transform.rotation;
+            target.z = 0;
+            myCamera.transform.rotation = Quaternion.RotateTowards(myCamera.transform.rotation, target, rotationSpeed * Time.deltaTime);
+
+            if (Mathf.Abs(myCamera.transform.eulerAngles.z) < 0.01f)
             {
-                Quaternion target = myCamera.transform.rotation;
-                target.z = 0;
-                //target = myCamera.transform.localToWorldMatrix
-                //Matrix4x4 rotMatrix = Matrix4x4.Rotate(target);
-                //target = rotMatrix.rotation;
-                myCamera.transform.rotation = Quaternion.RotateTowards(myCamera.transform.rotation, target, rotationSpeed * Time.deltaTime);
-            }
-            else
+                myCamera.transform.rotation = Quaternion.Euler(myCamera.transform.rotation.x, myCamera.transform.rotation.y, 0);
                 roll = false;
+            }
         }
+
+        Rotate(Vector3.up, inputX * rotationSpeed, Space.World);
+
+        Rotate(Vector3.right, -inputY * rotationSpeed, Space.Self);
     }
 
     void Zoom()
