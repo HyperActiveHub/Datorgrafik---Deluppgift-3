@@ -18,7 +18,7 @@ public class CameraControl : MonoBehaviour
     float zoomSpeed = 10;
 
     float defaultZoom;
-    bool roll;
+    public bool roll;
 
     void Start()
     {
@@ -68,6 +68,10 @@ public class CameraControl : MonoBehaviour
         float inputX = Input.GetAxis("Mouse X");
         float inputY = Input.GetAxis("Mouse Y");
 
+        Rotate(Vector3.up, inputX * rotationSpeed, Space.World);
+
+        Rotate(Vector3.right, -inputY * rotationSpeed, Space.Self);
+
         if (Input.GetMouseButtonDown(1))
         {
             roll = true;
@@ -80,8 +84,11 @@ public class CameraControl : MonoBehaviour
         else if (roll)
         {
             Quaternion target = myCamera.transform.rotation;
+
             target.z = 0;
             myCamera.transform.rotation = Quaternion.RotateTowards(myCamera.transform.rotation, target, rotationSpeed * Time.deltaTime);
+
+            print("resetting");
 
             if (Mathf.Abs(myCamera.transform.eulerAngles.z) < 0.01f)
             {
@@ -89,10 +96,6 @@ public class CameraControl : MonoBehaviour
                 roll = false;
             }
         }
-
-        Rotate(Vector3.up, inputX * rotationSpeed, Space.World);
-
-        Rotate(Vector3.right, -inputY * rotationSpeed, Space.Self);
     }
 
     void Zoom()
